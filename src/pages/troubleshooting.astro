@@ -1,0 +1,81 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Troubleshooting - FXCommands" description="Common issues and fixes for FXCommands Stream Deck plugin." ogUrl="https://josh.tf/fxcommands/troubleshooting">
+	<div class="page-header">
+		<div class="container">
+			<h1>Troubleshooting</h1>
+			<p>Common issues and how to fix them.</p>
+		</div>
+	</div>
+
+	<section>
+		<div class="container">
+			<div class="faq">
+				<details class="faq-item" open>
+					<summary>Button shows a grey icon or yellow triangle</summary>
+					<div class="faq-content"><div>
+						<p>The plugin may not have installed correctly or the version is outdated. Uninstall FXCommands from the Stream Deck app, then reinstall the latest version from <a href="https://github.com/josh-tf/fxcommands/releases/latest" target="_blank" rel="noopener">GitHub Releases</a>. Make sure you're running Stream Deck <strong>6.9 or later</strong>.</p>
+					</div></div>
+				</details>
+
+				<details class="faq-item">
+					<summary>Commands aren't executing in-game</summary>
+					<div class="faq-content"><div>
+						<p>FiveM or RedM must be running and connected to a server. FXCommands sends commands to <code>localhost:29200</code>, which is only available when the game is active. If the button flashes a yellow alert when pressed, it means the game console isn't reachable.</p>
+					</div></div>
+				</details>
+
+				<details class="faq-item">
+					<summary>Command requires multiple presses to work</summary>
+					<div class="faq-content"><div>
+						<p>Check your <strong>Advanced Settings</strong> and make sure you only have <strong>1 state</strong> configured. If you have multiple stages, the button cycles through them on each press, so only every Nth press runs the same command.</p>
+					</div></div>
+				</details>
+
+				<details class="faq-item">
+					<summary>"me" commands or emotes don't work</summary>
+					<div class="faq-content"><div>
+						<p>Command syntax varies between servers. Open the FiveM console (<strong>F8</strong>) and try the command directly to confirm it works on your server. Some servers require a <code>/</code> prefix or have custom command handlers.</p>
+					</div></div>
+				</details>
+
+				<details class="faq-item">
+					<summary>Plugin stopped working after a Stream Deck update</summary>
+					<div class="faq-content"><div>
+						<p>Download and reinstall the latest <code>.streamDeckPlugin</code> from <a href="https://github.com/josh-tf/fxcommands/releases/latest" target="_blank" rel="noopener">GitHub Releases</a>. Double-click to install. Your existing button settings and commands will be preserved.</p>
+					</div></div>
+				</details>
+
+				<details class="faq-item">
+					<summary>Settings or commands are missing after updating</summary>
+					<div class="faq-content"><div>
+						<p>The Elgato Marketplace version may be behind the latest release. Install directly from <a href="https://github.com/josh-tf/fxcommands/releases/latest" target="_blank" rel="noopener">GitHub Releases</a> to get the most recent version with full settings compatibility.</p>
+					</div></div>
+				</details>
+
+				<details class="faq-item">
+					<summary>Delayed commands aren't working</summary>
+					<div class="faq-content"><div>
+						<p>Make sure you're using the correct syntax: <code>;;</code> for a 500ms delay, or <code>{'{NNNms}'}</code> for a custom delay (e.g. <code>{'{2000ms}'}</code>). The single <code>;</code> separator chains commands without delay. Delays require <strong>v2.0.4</strong> or later.</p>
+					</div></div>
+				</details>
+
+				<details class="faq-item">
+					<summary>Can I use this with RedM?</summary>
+					<div class="faq-content"><div>
+						<p>Yes. FXCommands works with both FiveM and RedM. Both games use the same console protocol on <code>localhost:29200</code>.</p>
+					</div></div>
+				</details>
+			</div>
+		</div>
+	</section>
+
+	<section>
+		<div class="container" style="text-align: center">
+			<p style="color: var(--text-muted); margin-bottom: 16px">Still stuck? Open an issue on GitHub.</p>
+			<a href="https://github.com/josh-tf/fxcommands/issues" target="_blank" rel="noopener" class="btn btn-secondary">Report an Issue</a>
+		</div>
+	</section>
+</Base>

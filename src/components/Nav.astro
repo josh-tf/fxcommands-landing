@@ -1,0 +1,77 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<nav>
+	<div class="container">
+		<a href={base} class="nav-brand">
+			<img src={`${base}icon.png`} alt="" class="nav-icon" />
+			FXCommands
+		</a>
+		<div class="nav-links">
+			<a href={base}>Home</a>
+			<a href={`${base}setup/`}>Setup</a>
+			<a href={`${base}troubleshooting/`}>Help</a>
+			<a href={`${base}migrate/`}>Migrate</a>
+			<a href="https://github.com/josh-tf/fxcommands" target="_blank" rel="noopener">GitHub</a>
+		</div>
+	</div>
+</nav>
+
+<style>
+	nav {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		background: rgba(14, 14, 18, 0.9);
+		backdrop-filter: blur(12px);
+		border-bottom: 1px solid var(--border);
+		padding: 14px 0;
+	}
+
+	nav .container {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.nav-brand {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-weight: 700;
+		font-size: 1.1rem;
+		color: var(--text);
+		text-decoration: none;
+	}
+	.nav-brand:hover {
+		text-decoration: none;
+		color: var(--accent-hover);
+	}
+
+	.nav-icon {
+		width: 24px;
+		height: 24px;
+	}
+
+	.nav-links {
+		display: flex;
+		gap: 24px;
+	}
+
+	.nav-links a {
+		color: var(--text-muted);
+		font-size: 0.9rem;
+		font-weight: 500;
+	}
+	.nav-links a:hover {
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	@media (max-width: 640px) {
+		.nav-links {
+			gap: 16px;
+		}
+	}
+</style>

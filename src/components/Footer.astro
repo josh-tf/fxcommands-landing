@@ -1,0 +1,49 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<footer>
+	<div class="container">
+		<p class="footer-nav">
+			<a href={base}>Home</a>
+			<span>&middot;</span>
+			<a href={`${base}setup/`}>Setup</a>
+			<span>&middot;</span>
+			<a href={`${base}troubleshooting/`}>Help</a>
+			<span>&middot;</span>
+			<a href={`${base}migrate/`}>Migrate</a>
+			<span>&middot;</span>
+			<a href="https://github.com/josh-tf/fxcommands" target="_blank" rel="noopener">GitHub</a>
+		</p>
+		<p>
+			<a href="https://github.com/josh-tf/fxcommands/blob/main/LICENSE.md" target="_blank" rel="noopener">MIT License</a>
+			<span>&middot;</span>
+			Built by <a href="https://josh.tf" target="_blank" rel="noopener">josh-tf</a>
+		</p>
+	</div>
+</footer>
+
+<style>
+	footer {
+		border-top: 1px solid var(--border);
+		padding: 32px 0;
+		text-align: center;
+		color: var(--text-muted);
+		font-size: 0.85rem;
+	}
+
+	footer a {
+		color: var(--text-muted);
+	}
+	footer a:hover {
+		color: var(--text);
+	}
+
+	.footer-nav {
+		margin-bottom: 8px;
+	}
+
+	span {
+		margin: 0 4px;
+	}
+</style>

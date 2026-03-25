@@ -1,0 +1,208 @@
+---
+import Base from "../layouts/Base.astro";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Base title="Setup Guide - FXCommands" description="How to install and configure FXCommands for your Stream Deck." ogUrl="https://josh.tf/fxcommands/setup">
+	<div class="page-header">
+		<div class="container">
+			<h1>Setup Guide</h1>
+			<p>Get FXCommands installed and sending commands in under a minute.</p>
+		</div>
+	</div>
+
+	<section>
+		<div class="container">
+			<h2 class="section-title">Installation</h2>
+			<div class="guide-step">
+				<div class="guide-step-content">
+					<div class="step-number">1</div>
+					<div>
+						<h3>Download</h3>
+						<p>Get the plugin from the <a href="https://marketplace.elgato.com/product/fxcommands-3c018041-5776-412f-ad1b-1c0da734040b" target="_blank" rel="noopener">Marketplace</a> or download the <code>.streamDeckPlugin</code> file from <a href="https://github.com/josh-tf/fxcommands/releases/latest" target="_blank" rel="noopener">GitHub Releases</a>.</p>
+					</div>
+				</div>
+				<div class="guide-step-img">
+					<img src={`${base}gh-releases.png`} alt="GitHub releases page" class="guide-img" />
+				</div>
+			</div>
+			<div class="guide-step">
+				<div class="guide-step-content">
+					<div class="step-number">2</div>
+					<div>
+						<h3>Install</h3>
+						<p>Double-click the downloaded <code>.streamDeckPlugin</code> file. The Stream Deck app will prompt you to install.</p>
+					</div>
+				</div>
+				<div class="guide-step-img">
+					<img src={`${base}sd-install-prompt.png`} alt="Stream Deck install prompt" class="guide-img" />
+				</div>
+			</div>
+			<div class="guide-step">
+				<div class="guide-step-content">
+					<div class="step-number">3</div>
+					<div>
+						<h3>Verify</h3>
+						<p>In the Stream Deck app, search for <strong>FXCommands</strong> in the actions list. You should see the <strong>Run Command</strong> action.</p>
+					</div>
+				</div>
+				<div class="guide-step-img">
+					<img src={`${base}sd-search.png`} alt="FXCommands in Stream Deck action list" class="guide-img" />
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section>
+		<div class="container">
+			<h2 class="section-title">Basic Configuration</h2>
+			<div class="guide-step">
+				<div class="guide-step-content">
+					<div class="step-number">1</div>
+					<div>
+						<h3>Add to Deck</h3>
+						<p>Drag the <strong>Run Command</strong> action onto any button on your Stream Deck.</p>
+					</div>
+				</div>
+				<div class="guide-step-img">
+					<img src={`${base}sd-drag-action.png`} alt="Dragging FXCommands action to Stream Deck" class="guide-img" />
+				</div>
+			</div>
+			<div class="guide-step">
+				<div class="guide-step-content">
+					<div class="step-number">2</div>
+					<div>
+						<h3>Set Command</h3>
+						<p>Click the button to open its settings. Type your command in the <strong>On Press</strong> field, e.g. <code>e sit</code></p>
+					</div>
+				</div>
+				<div class="guide-step-img">
+					<img src={`${base}sd-property-inspector.png`} alt="FXCommands Property Inspector" class="guide-img" />
+				</div>
+			</div>
+			<div class="guide-step">
+				<div class="guide-step-content">
+					<div class="step-number">3</div>
+					<div>
+						<h3>Play</h3>
+						<p>Launch FiveM/RedM, connect to a server, and press your button. The command executes instantly.</p>
+					</div>
+				</div>
+				<div class="guide-step-img">
+					<img src={`${base}fivem-sit.png`} alt="Command executing in FiveM" class="guide-img" />
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section>
+		<div class="container">
+			<h2 class="section-title">Advanced Features</h2>
+			<div class="features-grid">
+				<div class="feature-card">
+					<h3>Press & Release</h3>
+					<p>Use <strong>On Press</strong> and <strong>On Release</strong> to run different commands on key down vs key up.</p>
+					<p class="feature-example">Press: <code>e sit</code><br />Release: <code>e c</code></p>
+				</div>
+				<div class="feature-card">
+					<h3>Multi-Stage Buttons</h3>
+					<p>Expand <strong>Advanced Settings</strong> and set the number of states (up to 5). Each state has its own press/release commands. The button cycles through them.</p>
+					<p class="feature-example">
+						<code>Stage 0: e sit</code><br />
+						<code>Stage 1: e c</code>
+					</p>
+				</div>
+				<div class="feature-card">
+					<h3>Chained Commands</h3>
+					<p>Use <code>;</code> to send multiple commands in a single press. FiveM processes them sequentially.</p>
+					<p class="feature-example"><code>e sit;me relaxes on the ground</code></p>
+				</div>
+				<div class="feature-card">
+					<h3>Delayed Commands</h3>
+					<p>Add a delay between commands using <code>;;</code> for 500ms or <code>{'{NNNms}'}</code> for a custom delay.</p>
+					<p class="feature-example">
+						<code>e think;{'{2000ms}'};e c</code><br />
+						<span class="muted">Emote for 2 seconds, then cancel</span>
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section>
+		<div class="container" style="text-align: center">
+			<p class="muted" style="margin-bottom: 16px">Having issues?</p>
+			<a href={`${base}troubleshooting/`} class="btn btn-secondary">Troubleshooting Guide</a>
+		</div>
+	</section>
+</Base>
+
+<style>
+	.muted {
+		color: var(--text-muted);
+		font-size: 0.85rem;
+	}
+
+	.guide-step {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 40px;
+		align-items: center;
+		margin-bottom: 48px;
+		padding-bottom: 48px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.guide-step:nth-child(even) {
+		direction: rtl;
+	}
+
+	.guide-step:nth-child(even) > * {
+		direction: ltr;
+	}
+
+	.guide-step:last-child {
+		border-bottom: none;
+		margin-bottom: 0;
+		padding-bottom: 0;
+	}
+
+	.guide-step-content {
+		display: flex;
+		gap: 16px;
+		align-items: flex-start;
+	}
+
+	.guide-step-content h3 {
+		font-size: 1.1rem;
+		margin-bottom: 8px;
+	}
+
+	.guide-step-content p {
+		font-size: 0.95rem;
+		color: var(--text-muted);
+		line-height: 1.5;
+	}
+
+	.guide-step-img {
+		display: flex;
+		justify-content: center;
+	}
+
+	.guide-img {
+		width: 100%;
+		max-height: 280px;
+		object-fit: cover;
+		border-radius: var(--radius);
+		border: 1px solid var(--border);
+		cursor: zoom-in;
+	}
+
+	@media (max-width: 640px) {
+		.guide-step {
+			grid-template-columns: 1fr;
+			gap: 16px;
+		}
+	}
+</style>

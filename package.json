@@ -1,0 +1,14 @@
+{
+	"name": "fxcommands-landing",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"deploy": "astro build && cp -r dist/ ../josh-tf/website/fxcommands/"
+	},
+	"dependencies": {
+		"astro": "^6.0.8"
+	}
+}

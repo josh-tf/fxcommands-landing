@@ -1,0 +1,126 @@
+---
+import Base from "../layouts/Base.astro";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Base title="FXCommands - FiveM & RedM Stream Deck Plugin" description="Send commands to your FiveM or RedM client console directly from your Stream Deck.">
+	<section class="hero">
+		<div class="container">
+			<img src={`${base}banner.png`} alt="FXCommands" class="hero-banner" />
+			<p>Send commands to your FiveM or RedM client console directly from your Stream Deck.</p>
+			<div class="hero-buttons">
+				<a href="https://marketplace.elgato.com/product/fxcommands-3c018041-5776-412f-ad1b-1c0da734040b" target="_blank" rel="noopener" class="btn btn-primary">Get on Marketplace</a>
+				<a href="https://github.com/josh-tf/fxcommands/releases/latest" target="_blank" rel="noopener" class="btn btn-secondary">Download from GitHub</a>
+			</div>
+		</div>
+	</section>
+
+	<section>
+		<div class="container">
+			<h2 class="section-title">Features</h2>
+			<div class="features-grid">
+				<div class="feature-card">
+					<h3>Press & Release</h3>
+					<p>Assign different commands to key down and key up. Send <code>e sit</code> on press and <code>e c</code> on release to create a hold-to-emote button.</p>
+				</div>
+				<div class="feature-card">
+					<h3>Multi-Stage Buttons</h3>
+					<p>Up to <strong>5 states</strong> per button. Each press cycles to the next command, then loops back. Perfect for toggle emotes or multi-step RP sequences.</p>
+					<p class="feature-example"><code>Stage 0: e sit</code> &rarr; <code>Stage 1: e c</code></p>
+				</div>
+				<div class="feature-card">
+					<h3>Chained Commands</h3>
+					<p>Send multiple commands in a single press using <code>;</code> as a separator. FiveM executes them sequentially.</p>
+					<p class="feature-example"><code>e sit;me relaxes on the ground</code></p>
+				</div>
+				<div class="feature-card">
+					<h3>Delayed Commands</h3>
+					<p>Add timed delays between commands with <code>;;</code> for 500ms or <code>{'{NNNms}'}</code> for custom timing. Great for timed emote sequences.</p>
+					<p class="feature-example"><code>e think;{'{2000ms}'};e c</code></p>
+				</div>
+				<div class="feature-card">
+					<h3>Connection Feedback</h3>
+					<p>Visual alert on the button when a command fails to send, so you know immediately if FiveM isn't running or the connection dropped.</p>
+				</div>
+				<div class="feature-card">
+					<h3>Persistent Connection</h3>
+					<p>Connects to the FiveM console once on load and stays open. Commands send instantly with no reconnect delay between presses.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section>
+		<div class="container">
+			<h2 class="section-title">Get Started</h2>
+			<div class="steps">
+				<div class="step">
+					<div class="step-number">1</div>
+					<h3>Install</h3>
+					<p>Download and double-click to install.</p>
+				</div>
+				<div class="step">
+					<div class="step-number">2</div>
+					<h3>Configure</h3>
+					<p>Drag the action onto your deck and enter a command.</p>
+				</div>
+				<div class="step">
+					<div class="step-number">3</div>
+					<h3>Play</h3>
+					<p>Press the button to send it in-game.</p>
+				</div>
+			</div>
+			<div style="text-align: center; margin-top: 24px">
+				<a href={`${base}setup/`} class="btn btn-secondary">Full Setup Guide</a>
+			</div>
+		</div>
+	</section>
+</Base>
+
+<style>
+	.hero {
+		text-align: center;
+		padding: 80px 0 48px;
+	}
+
+	.hero-banner {
+		width: 100%;
+		max-width: 720px;
+		border-radius: var(--radius);
+		margin-bottom: 32px;
+	}
+
+	.hero h1 {
+		font-size: 2.5rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		margin-bottom: 12px;
+	}
+
+	.hero p {
+		font-size: 1.2rem;
+		color: var(--text-muted);
+		max-width: 520px;
+		margin: 0 auto 32px;
+	}
+
+	.hero-buttons {
+		display: flex;
+		gap: 16px;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+
+	@media (max-width: 640px) {
+		.hero {
+			padding: 48px 0 32px;
+		}
+		.hero h1 {
+			font-size: 1.8rem;
+		}
+		.hero p {
+			font-size: 1rem;
+		}
+	}
+</style>

@@ -1,0 +1,405 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Profile Migrator - FXCommands" description="Update your Stream Deck profile to work with the latest FXCommands plugin." ogUrl="https://josh.tf/fxcommands/migrate">
+	<div class="page-header">
+		<div class="container">
+			<h1>Profile Migrator</h1>
+			<p>Update exported Stream Deck profiles from the old plugin UUID to the current one. Runs entirely in your browser - no files are uploaded.</p>
+		</div>
+	</div>
+
+	<section>
+		<div class="container">
+			<div class="migrator">
+				<div class="drop-zone" id="drop-zone">
+					<div class="drop-zone-content">
+						<p class="drop-icon">&#128196;</p>
+						<p>Drag and drop your <code>.streamDeckProfile</code> file here</p>
+						<p class="muted">or click to browse</p>
+					</div>
+					<input type="file" id="file-input" accept=".streamDeckProfile" />
+				</div>
+
+				<div id="status" class="status" style="display: none"></div>
+
+				<div id="result" class="result" style="display: none">
+					<div class="result-header">
+						<span class="result-icon">&#10003;</span>
+						<div>
+							<p class="result-title"><strong id="result-count">0</strong> action(s) updated</p>
+							<p class="muted" id="result-detail"></p>
+						</div>
+					</div>
+					<div class="result-file">
+						<p class="result-filename" id="result-filename"></p>
+						<p class="muted" id="result-size"></p>
+					</div>
+					<div class="result-actions">
+						<button id="download-btn" class="btn-download">
+							<span class="download-label">
+								<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 2v9M4 8l4 4 4-4M2 14h12"/></svg>
+								Download
+							</span>
+							<span class="download-done" style="display: none">
+								<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8.5l3.5 3.5 6.5-7"/></svg>
+								Downloaded
+							</span>
+						</button>
+						<button id="reset-btn" class="btn-reset">Process Another</button>
+					</div>
+				</div>
+
+				<div class="info-card">
+					<h3>What does this do?</h3>
+					<p>If you're migrating from an older version of FXCommands (previously known as <code>com.egg-rp.fxcommands</code>), your exported profiles reference the old plugin UUID. This tool updates those references to <code>tf.josh.fxcommands</code> so your buttons work with the current version.</p>
+					<h3 style="margin-top: 16px">How to use</h3>
+					<ol>
+						<li>In the Stream Deck app, right-click your profile and choose <strong>Export</strong></li>
+						<li>Drop the exported <code>.streamDeckProfile</code> file above</li>
+						<li>Download the updated file and double-click to import it back</li>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</section>
+</Base>
+
+<script>
+	const OLD_UUIDS = [
+		"com.egg-rp.fxcommands",
+		"com.eggrp.fxcommands",
+		"com.egg-rp.fivem-commands"
+	];
+	const NEW_UUID = "tf.josh.fxcommands";
+
+	const dropZone = document.getElementById("drop-zone")!;
+	const fileInput = document.getElementById("file-input") as HTMLInputElement;
+	const status = document.getElementById("status")!;
+	const result = document.getElementById("result")!;
+	const resultCount = document.getElementById("result-count")!;
+	const resultDetail = document.getElementById("result-detail")!;
+	const resultFilename = document.getElementById("result-filename")!;
+	const resultSize = document.getElementById("result-size")!;
+	const downloadBtn = document.getElementById("download-btn")!;
+	const resetBtn = document.getElementById("reset-btn")!;
+	const downloadLabel = downloadBtn.querySelector(".download-label") as HTMLElement;
+	const downloadDone = downloadBtn.querySelector(".download-done") as HTMLElement;
+
+	let updatedBlob: Blob | null = null;
+	let originalName = "updated.streamDeckProfile";
+
+	const JSZip = await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm").then(m => m.default);
+
+	function formatSize(bytes: number): string {
+		if (bytes < 1024) return bytes + " B";
+		if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+		return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+	}
+
+	function reset() {
+		result.style.display = "none";
+		status.style.display = "none";
+		dropZone.style.display = "block";
+		downloadLabel.style.display = "flex";
+		downloadDone.style.display = "none";
+		downloadBtn.classList.remove("downloaded");
+		fileInput.value = "";
+		updatedBlob = null;
+	}
+
+	dropZone.addEventListener("click", () => fileInput.click());
+	dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+	dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+	dropZone.addEventListener("drop", (e) => {
+		e.preventDefault();
+		dropZone.classList.remove("dragover");
+		const file = e.dataTransfer?.files[0];
+		if (file) processFile(file);
+	});
+	fileInput.addEventListener("change", () => {
+		const file = fileInput.files?.[0];
+		if (file) processFile(file);
+	});
+	downloadBtn.addEventListener("click", () => {
+		if (!updatedBlob) return;
+		const a = document.createElement("a");
+		a.href = URL.createObjectURL(updatedBlob);
+		a.download = originalName;
+		a.click();
+		URL.revokeObjectURL(a.href);
+
+		downloadLabel.style.display = "none";
+		downloadDone.style.display = "flex";
+		downloadBtn.classList.add("downloaded");
+	});
+	resetBtn.addEventListener("click", reset);
+
+	async function processFile(file: File) {
+		originalName = file.name;
+		dropZone.style.display = "none";
+		status.style.display = "block";
+		status.textContent = "Processing...";
+		status.className = "status";
+		result.style.display = "none";
+
+		try {
+			const zip = await JSZip.loadAsync(file);
+			let totalReplacements = 0;
+			const replacedIn: string[] = [];
+
+			for (const [path, zipEntry] of Object.entries(zip.files)) {
+				if (path.endsWith("manifest.json")) {
+					let content = await (zipEntry as any).async("string");
+					let changed = false;
+
+					for (const oldUuid of OLD_UUIDS) {
+						if (content.includes(oldUuid)) {
+							const count = (content.match(new RegExp(oldUuid.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) || []).length;
+							content = content.replaceAll(oldUuid, NEW_UUID);
+							totalReplacements += count;
+							changed = true;
+						}
+					}
+
+					if (changed) {
+						zip.file(path, content);
+						replacedIn.push(path);
+					}
+				}
+			}
+
+			if (totalReplacements === 0) {
+				status.textContent = "No old UUIDs found in this profile. It may already be up to date.";
+				status.className = "status status-warn";
+				dropZone.style.display = "block";
+				return;
+			}
+
+			updatedBlob = await zip.generateAsync({ type: "blob" });
+			status.style.display = "none";
+			result.style.display = "block";
+			resultCount.textContent = String(totalReplacements);
+			resultDetail.textContent = `across ${replacedIn.length} manifest file(s)`;
+			resultFilename.textContent = originalName;
+			resultSize.textContent = formatSize(updatedBlob.size);
+
+			downloadLabel.style.display = "flex";
+			downloadDone.style.display = "none";
+			downloadBtn.classList.remove("downloaded");
+		} catch (err) {
+			status.textContent = `Error: ${(err as Error).message}`;
+			status.className = "status status-error";
+			dropZone.style.display = "block";
+		}
+	}
+</script>
+
+<style>
+	.migrator {
+		max-width: 600px;
+		margin: 0 auto;
+	}
+
+	.drop-zone {
+		position: relative;
+		border: 2px dashed var(--border);
+		border-radius: var(--radius);
+		padding: 48px 24px;
+		text-align: center;
+		cursor: pointer;
+		transition: border-color 0.2s, background 0.2s;
+	}
+
+	.drop-zone:hover,
+	.drop-zone.dragover {
+		border-color: var(--accent);
+		background: rgba(32, 76, 254, 0.05);
+	}
+
+	.drop-zone input {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		cursor: pointer;
+	}
+
+	.drop-icon {
+		font-size: 2.5rem;
+		margin-bottom: 12px;
+	}
+
+	.drop-zone code {
+		font-size: 0.9rem;
+	}
+
+	.muted {
+		color: var(--text-muted);
+		font-size: 0.85rem;
+		margin-top: 8px;
+	}
+
+	.status {
+		margin-top: 20px;
+		padding: 16px 20px;
+		border-radius: 8px;
+		background: var(--bg-card);
+		border: 1px solid var(--border);
+		text-align: center;
+	}
+
+	.status-warn {
+		border-color: #b8860b;
+		color: #f0c040;
+	}
+
+	.status-error {
+		border-color: #c0392b;
+		color: #e74c3c;
+	}
+
+	.result {
+		margin-top: 20px;
+		padding: 28px;
+		border-radius: var(--radius);
+		background: var(--bg-card);
+		border: 1px solid #2a6e2a;
+	}
+
+	.result-header {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		margin-bottom: 20px;
+	}
+
+	.result-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		background: #2a6e2a;
+		color: #4ade80;
+		font-size: 1.2rem;
+		flex-shrink: 0;
+	}
+
+	.result-title strong {
+		font-size: 1.2rem;
+		color: #4ade80;
+	}
+
+	.result-file {
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		padding: 14px 18px;
+		margin-bottom: 20px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.result-filename {
+		font-family: "Consolas", "Courier New", monospace;
+		font-size: 0.9rem;
+		word-break: break-all;
+	}
+
+	.result-actions {
+		display: flex;
+		gap: 12px;
+	}
+
+	.btn-download {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 14px 24px;
+		border-radius: 8px;
+		font-size: 1rem;
+		font-weight: 600;
+		border: none;
+		cursor: pointer;
+		background: var(--accent);
+		color: #fff;
+		transition: background 0.2s, transform 0.1s;
+	}
+
+	.btn-download:hover {
+		background: var(--accent-hover);
+		transform: translateY(-1px);
+	}
+
+	.btn-download:active {
+		transform: translateY(0);
+	}
+
+	.btn-download.downloaded {
+		background: #2a6e2a;
+		cursor: default;
+	}
+
+	.btn-download.downloaded:hover {
+		background: #2a6e2a;
+		transform: none;
+	}
+
+	.download-label,
+	.download-done {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.btn-reset {
+		padding: 14px 20px;
+		border-radius: 8px;
+		font-size: 0.9rem;
+		font-weight: 500;
+		border: 1px solid var(--border);
+		cursor: pointer;
+		background: transparent;
+		color: var(--text-muted);
+		transition: background 0.2s, color 0.2s;
+	}
+
+	.btn-reset:hover {
+		background: var(--bg-card-hover);
+		color: var(--text);
+	}
+
+	.info-card {
+		margin-top: 32px;
+		padding: 24px;
+		border-radius: var(--radius);
+		background: var(--bg-card);
+		border: 1px solid var(--border);
+	}
+
+	.info-card h3 {
+		font-size: 1rem;
+		margin-bottom: 8px;
+	}
+
+	.info-card p,
+	.info-card li {
+		font-size: 0.9rem;
+		color: var(--text-muted);
+		line-height: 1.6;
+	}
+
+	.info-card ol {
+		padding-left: 20px;
+		margin-top: 8px;
+	}
+
+	.info-card li {
+		margin-bottom: 4px;
+	}
+</style>

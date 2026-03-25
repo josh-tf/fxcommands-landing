@@ -1,0 +1,196 @@
+---
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import "../styles/global.css";
+
+interface Props {
+	title: string;
+	description: string;
+	ogUrl?: string;
+}
+
+const base = import.meta.env.BASE_URL;
+const { title, description, ogUrl = "https://josh.tf/fxcommands" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={ogUrl} />
+		<link rel="icon" type="image/png" href={`${base}icon.png`} />
+	</head>
+	<body>
+		<Nav />
+		<main>
+			<slot />
+		</main>
+		<Footer />
+
+		<button id="scroll-top" aria-label="Scroll to top">&uarr;</button>
+
+		<!-- Lightbox -->
+		<div id="lightbox">
+			<img id="lightbox-img" alt="" />
+		</div>
+
+		<script>
+			// Scroll to top
+			const btn = document.getElementById("scroll-top")!;
+			window.addEventListener("scroll", () => {
+				btn.classList.toggle("visible", window.scrollY > 400);
+			});
+			btn.addEventListener("click", () => {
+				window.scrollTo({ top: 0, behavior: "smooth" });
+			});
+
+			// FAQ accordion with JS animation
+			function closeFaq(details: HTMLDetailsElement, content: HTMLElement, instant = false) {
+				if (!details.open) return;
+				if (instant) {
+					details.open = false;
+					content.style.maxHeight = "";
+					return;
+				}
+				// Set explicit height so transition has a start value
+				content.style.maxHeight = content.scrollHeight + "px";
+				// Force reflow, then animate to 0
+				void content.offsetHeight;
+				content.style.maxHeight = "0px";
+				content.addEventListener("transitionend", () => {
+					details.open = false;
+					content.style.maxHeight = "";
+				}, { once: true });
+			}
+
+			function openFaq(details: HTMLDetailsElement, content: HTMLElement) {
+				details.open = true;
+				// Start from 0, animate to full height
+				content.style.maxHeight = "0px";
+				// Force reflow so the browser registers the 0 state
+				void content.offsetHeight;
+				content.style.maxHeight = content.scrollHeight + "px";
+				content.addEventListener("transitionend", () => {
+					// Clear inline style so content can reflow naturally
+					content.style.maxHeight = "";
+				}, { once: true });
+			}
+
+			document.querySelectorAll(".faq-item").forEach((item) => {
+				const summary = item.querySelector("summary")!;
+				const content = item.querySelector(".faq-content") as HTMLElement;
+				if (!content) return;
+
+				summary.addEventListener("click", (e) => {
+					e.preventDefault();
+					const details = item as HTMLDetailsElement;
+					const isOpen = details.open;
+					const scrollY = window.scrollY;
+
+					// Close all others instantly (no animation to avoid scroll jank)
+					document.querySelectorAll(".faq-item").forEach((other) => {
+						if (other === item) return;
+						const od = other as HTMLDetailsElement;
+						const oc = other.querySelector(".faq-content") as HTMLElement;
+						if (od.open && oc) closeFaq(od, oc, true);
+					});
+					window.scrollTo({ top: scrollY, behavior: "instant" });
+
+					// Toggle the clicked one with animation
+					if (isOpen) {
+						closeFaq(details, content);
+					} else {
+						openFaq(details, content);
+					}
+				});
+			});
+
+			// Lightbox
+			const lightbox = document.getElementById("lightbox")!;
+			const lightboxImg = document.getElementById("lightbox-img") as HTMLImageElement;
+
+			document.querySelectorAll(".guide-img").forEach((img) => {
+				img.addEventListener("click", () => {
+					lightboxImg.src = (img as HTMLImageElement).src;
+					lightbox.classList.add("active");
+				});
+			});
+
+			lightbox.addEventListener("click", () => {
+				lightbox.classList.remove("active");
+			});
+
+			document.addEventListener("keydown", (e) => {
+				if (e.key === "Escape") lightbox.classList.remove("active");
+			});
+		</script>
+
+		<style>
+			#scroll-top {
+				position: fixed;
+				bottom: 32px;
+				right: 32px;
+				width: 44px;
+				height: 44px;
+				border-radius: 50%;
+				background: var(--accent);
+				color: #fff;
+				border: none;
+				font-size: 1.2rem;
+				cursor: pointer;
+				opacity: 0;
+				transform: translateY(16px);
+				transition: opacity 0.3s, transform 0.3s;
+				pointer-events: none;
+				z-index: 20;
+			}
+
+			#scroll-top.visible {
+				opacity: 1;
+				transform: translateY(0);
+				pointer-events: auto;
+			}
+
+			#scroll-top:hover {
+				background: var(--accent-hover);
+			}
+
+			#lightbox {
+				position: fixed;
+				inset: 0;
+				z-index: 100;
+				background: rgba(0, 0, 0, 0.85);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.25s;
+				cursor: zoom-out;
+			}
+
+			#lightbox.active {
+				opacity: 1;
+				pointer-events: auto;
+			}
+
+			#lightbox img {
+				max-width: 90vw;
+				max-height: 90vh;
+				border-radius: 8px;
+				transform: scale(0.95);
+				transition: transform 0.25s;
+			}
+
+			#lightbox.active img {
+				transform: scale(1);
+			}
+		</style>
+	</body>
+</html>
