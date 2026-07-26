@@ -136,12 +136,12 @@ const base = import.meta.env.BASE_URL;
 					<p>Drop the action onto the dial row and the panel gains a <strong>Dial</strong> section: separate commands for rotate left, rotate right and screen tap. Pushing the dial uses the same press/release fields as a key.</p>
 					<p class="feature-example">
 						<code>radio_volume_adjust {'{ticks}'}</code><br />
-						<span class="muted">{'{ticks}'} is how far it turned — negative left, positive right</span>
+						<span class="muted">{'{ticks}'} is how far it turned, negative left, positive right</span>
 					</p>
 				</div>
 				<div class="feature-card">
 					<h3>Command Responses</h3>
-					<p>Tick <strong>Show response</strong> and the plugin appends a short <code>@fxid:</code> token to the command, then shows whatever your resource prints back alongside it. Only enable it on commands whose handler strips that token.</p>
+					<p>Tick <strong>Enable command responses</strong> in <strong>Advanced Settings</strong> to switch the feature on, then tick <strong>Show response</strong> under any command. The plugin appends a short <code>@fxid:</code> token and shows whatever your resource prints back alongside it. Only tick it for commands whose handler strips that token.</p>
 					<p class="feature-example">
 						<code>print(("%s %s"):format(sdToken, volume))</code><br />
 						<span class="muted">On a dial, print a trailing % to draw a bar</span>
