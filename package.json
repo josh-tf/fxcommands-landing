@@ -9,7 +9,7 @@
 		"deploy": "bash scripts/deploy.sh"
 	},
 	"dependencies": {
-		"astro": "^6.0.8"
+		"astro": "^6.4.8"
 	},
 	"devDependencies": {
 		"sharp": "^0.35.3"
