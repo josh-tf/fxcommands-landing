@@ -54,6 +54,11 @@ const base = import.meta.env.BASE_URL;
 					<p class="feature-example"><code>Radio Volume &rarr; 60%</code></p>
 				</div>
 				<div class="feature-card">
+					<h3>Remote &amp; CL2</h3>
+					<p>Point a button at a different console with an optional IP and port override. Each button keeps its own, so one deck can drive two running clients.</p>
+					<p class="feature-example"><code>127.0.0.1:29300</code> <span class="muted">CL2</span></p>
+				</div>
+				<div class="feature-card">
 					<h3>Connection Feedback</h3>
 					<p>Visual alert on the button when a command fails to send, so you know immediately if FiveM isn't running or the connection dropped.</p>
 				</div>
@@ -93,6 +98,11 @@ const base = import.meta.env.BASE_URL;
 </Base>
 
 <style>
+	.muted {
+		color: var(--text-muted);
+		font-size: 0.85rem;
+	}
+
 	.hero {
 		text-align: center;
 		padding: 80px 0 48px;

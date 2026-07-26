@@ -80,6 +80,15 @@ import Base from "../layouts/Base.astro";
 				</details>
 
 				<details class="faq-item">
+					<summary>Connecting to CL2, or to a game on another PC</summary>
+					<div class="faq-content"><div>
+						<p>FXCommands talks to <code>127.0.0.1:29200</code> by default. Tick <strong>Enable custom server IP/Port</strong> in <strong>Advanced Settings</strong> to override either value. Leaving a field blank falls back to the default, and switching the toggle off returns to the local default without clearing what you typed.</p>
+						<p>CL2 listens on <code>29300</code> rather than <code>29200</code>, so set the port and start the client with <code>-cl2</code>. For a game on another machine, set the IP and start that client with <code>-devcon</code>, otherwise its console only listens on loopback and the connection will not be accepted.</p>
+						<p>This needs <strong>v2.1.1</strong> or later. Each button stores its own address, so one deck can drive two clients at once.</p>
+					</div></div>
+				</details>
+
+				<details class="faq-item">
 					<summary>Can I use this with RedM?</summary>
 					<div class="faq-content"><div>
 						<p>Yes. FXCommands works with both FiveM and RedM. Both games use the same console protocol on <code>localhost:29200</code>.</p>

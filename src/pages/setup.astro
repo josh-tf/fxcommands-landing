@@ -2,6 +2,34 @@
 import Base from "../layouts/Base.astro";
 
 const base = import.meta.env.BASE_URL;
+
+// Kept as template literals so braces and % signs survive without escaping.
+const rotateExamples = `# Send the raw detent delta, letting the server apply it
+radio_volume_adjust {ticks}
+
+# Send an absolute target the server can set directly
+radio_volume_set {rotationPercent}`;
+
+const tokenExample = `radio_voldown @fxid:ab12cd34`;
+
+const luaHandler = `RegisterCommand('radio_voldown', function(source, args)
+    local sdToken = nil
+    if args[#args] and args[#args]:match("^@fxid:") then
+        sdToken = table.remove(args)
+    end
+
+    -- Regular command logic here
+
+    if sdToken then
+        print(("%s %s"):format(sdToken, "60.0"))
+    end
+end)`;
+
+const luaPercent = `print(("%s %d%%"):format(sdToken, volume))`;
+
+const labelExample = `Volume
+
+{value}`;
 ---
 
 <Base title="Setup Guide - FXCommands" description="How to install and configure FXCommands for your Stream Deck." ogUrl="https://josh.tf/fxcommands/setup">
@@ -132,22 +160,6 @@ const base = import.meta.env.BASE_URL;
 					</p>
 				</div>
 				<div class="feature-card">
-					<h3>Stream Deck+ Dials</h3>
-					<p>Drop the action onto the dial row and the panel gains a <strong>Dial</strong> section: separate commands for rotate left, rotate right and screen tap. Pushing the dial uses the same press/release fields as a key.</p>
-					<p class="feature-example">
-						<code>radio_volume_adjust {'{ticks}'}</code><br />
-						<span class="muted">{'{ticks}'} is how far it turned, negative left, positive right</span>
-					</p>
-				</div>
-				<div class="feature-card">
-					<h3>Command Responses</h3>
-					<p>Tick <strong>Enable command responses</strong> in <strong>Advanced Settings</strong> to switch the feature on, then tick <strong>Show response</strong> under any command. The plugin appends a short <code>@fxid:</code> token and shows whatever your resource prints back alongside it. Only tick it for commands whose handler strips that token.</p>
-					<p class="feature-example">
-						<code>print(("%s %s"):format(sdToken, volume))</code><br />
-						<span class="muted">On a dial, print a trailing % to draw a bar</span>
-					</p>
-				</div>
-				<div class="feature-card">
 					<h3>Chained Commands</h3>
 					<p>Use <code>;</code> to send multiple commands in a single press. FiveM processes them sequentially.</p>
 					<p class="feature-example"><code>e sit;me relaxes on the ground</code></p>
@@ -158,6 +170,196 @@ const base = import.meta.env.BASE_URL;
 					<p class="feature-example">
 						<code>e think;{'{2000ms}'};e c</code><br />
 						<span class="muted">Emote for 2 seconds, then cancel</span>
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="dials">
+		<div class="container">
+			<h2 class="section-title">Stream Deck+ Dials</h2>
+			<div class="doc">
+				<p>
+					Drop the action onto the dial row of a Stream Deck+ and the Property Inspector gains a
+					<strong>Dial</strong> section with three extra commands. Pushing the dial uses the same
+					<strong>Command</strong> and <strong>On Release</strong> fields as a key, so a dial can also cycle
+					through stages.
+				</p>
+
+				<div class="table-scroll">
+					<table class="doc-table">
+						<thead>
+							<tr><th>Trigger</th><th>Field</th><th>Runs when</th></tr>
+						</thead>
+						<tbody>
+							<tr><td>Push</td><td>Command / On Release</td><td>The dial is pressed and released</td></tr>
+							<tr><td>Rotate left</td><td>Rotate Left</td><td>The dial turns anticlockwise</td></tr>
+							<tr><td>Rotate right</td><td>Rotate Right</td><td>The dial turns clockwise</td></tr>
+							<tr><td>Touch</td><td>Touch</td><td>The touch strip above the dial is tapped</td></tr>
+						</tbody>
+					</table>
+				</div>
+
+				<h3>Rotation placeholders</h3>
+				<p>Rotation commands support placeholders that are substituted before the command is sent.</p>
+
+				<div class="table-scroll">
+					<table class="doc-table">
+						<thead>
+							<tr><th>Placeholder</th><th>Value</th></tr>
+						</thead>
+						<tbody>
+							<tr><td><code>{'{ticks}'}</code></td><td>Detents moved this event, negative left, positive right</td></tr>
+							<tr><td><code>{'{rotationPercent}'}</code></td><td>Running position as <code>0</code> to <code>100</code></td></tr>
+							<tr><td><code>{'{rotationAbsolute}'}</code></td><td>Running position as <code>0</code> to <code>255</code></td></tr>
+						</tbody>
+					</table>
+				</div>
+
+				<pre class="code-block">{rotateExamples}</pre>
+
+				<div class="callout callout-note">
+					<strong>Note</strong>
+					<p>
+						<code>{'{rotationPercent}'}</code> and <code>{'{rotationAbsolute}'}</code> track a counter held by
+						the plugin, not the game's real value. It starts at <code>0</code>, is clamped to
+						<code>0</code>-<code>255</code>, and will drift if something changes the value in-game. Prefer
+						<code>{'{ticks}'}</code> unless your server echoes its state back.
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="responses">
+		<div class="container">
+			<h2 class="section-title">Command Responses</h2>
+			<div class="doc">
+				<p>
+					A button can display a value your server sends back: current radio volume, fuel level, on-duty
+					count, anything you can <code>print</code>. It needs a change on the server, so it stays out of the
+					way until you ask for it. Tick <strong>Enable command responses</strong> in
+					<strong>Advanced Settings</strong> and the per-command <strong>Show response</strong> checkboxes
+					appear.
+				</p>
+
+				<h3>How it works</h3>
+				<p>When <strong>Show response</strong> is ticked, FXCommands appends a short correlation token to the command.</p>
+				<pre class="code-block">{tokenExample}</pre>
+				<p>
+					It then watches the console for a line <strong>containing that same token</strong>, strips the token
+					out, and shows what's left. The token exists so that pressing several buttons at once doesn't cross
+					wires. If nothing matches before the response timeout, the button is left unchanged.
+				</p>
+
+				<h3>Server-side handler</h3>
+				<p>Your command needs to pull the token off the end of its arguments and echo it back with the value. Client-side Lua:</p>
+				<pre class="code-block">{luaHandler}</pre>
+
+				<div class="callout callout-important">
+					<strong>Important</strong>
+					<p>
+						Print the token on the <strong>same line</strong> as the value. Its position doesn't matter, it's
+						stripped out and whatever remains is displayed. Print nothing else on that line.
+					</p>
+				</div>
+
+				<div class="callout callout-caution">
+					<strong>Caution</strong>
+					<p>
+						Only tick <strong>Show response</strong> for commands whose handler strips the token, as shown
+						above. Any other command will receive <code>@fxid:...</code> as an unexpected extra argument.
+					</p>
+				</div>
+
+				<h3>Displaying the value</h3>
+				<div class="table-scroll">
+					<table class="doc-table">
+						<thead>
+							<tr><th>Control</th><th>Where the value appears</th></tr>
+						</thead>
+						<tbody>
+							<tr><td>Key</td><td>The button title</td></tr>
+							<tr><td>Dial</td><td>The touch-strip value field</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<p>
+					For keys, <strong>Response Label</strong> controls the formatting. Use <code>{'{value}'}</code> for
+					the response, press Enter for a line break, and leave it blank to replace the title with the raw
+					response.
+				</p>
+				<pre class="code-block">{labelExample}</pre>
+				<p>
+					On a dial, a response formatted as a <strong>percentage</strong> additionally draws a progress bar.
+					Print a trailing <code>%</code> to opt in: <code>60%</code> shows the bar, <code>60</code> shows the
+					value alone.
+				</p>
+				<pre class="code-block">{luaPercent}</pre>
+
+				<h3>Init command</h3>
+				<p>
+					<strong>Get Value</strong> runs whenever the button appears (plugin start, profile load, page switch)
+					so the button shows the current value instead of a stale one. It captures a response the same way, so
+					its handler needs the same token handling.
+				</p>
+				<p>
+					Tick <strong>Also run after commands without "Show response"</strong> to re-read the value after any
+					command on that button, which is useful when the command that changes a value isn't the one that
+					reports it.
+				</p>
+				<p>
+					<strong>Response Timeout</strong> in Advanced Settings controls how long to wait, defaulting to
+					1500ms. The ceiling is 5000ms because the FiveM client drops the connection after five seconds of
+					inactivity.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<section id="server">
+		<div class="container">
+			<h2 class="section-title">Connecting to a Different Console</h2>
+			<div class="doc">
+				<p>
+					By default FXCommands talks to the game on this PC at <code>127.0.0.1:29200</code>. Tick
+					<strong>Enable custom server IP/Port</strong> in <strong>Advanced Settings</strong> to point a button
+					somewhere else. Leaving either field blank falls back to the default.
+				</p>
+
+				<div class="table-scroll">
+					<table class="doc-table">
+						<thead>
+							<tr><th>Setting</th><th>Default</th><th>Use it for</th></tr>
+						</thead>
+						<tbody>
+							<tr><td>Server IP</td><td><code>127.0.0.1</code></td><td>A game running on another machine</td></tr>
+							<tr><td>Server Port</td><td><code>29200</code></td><td>CL2, which listens on <code>29300</code></td></tr>
+						</tbody>
+					</table>
+				</div>
+
+				<p>
+					Each button keeps its own address, so one deck can drive two running clients at once. Switching the
+					toggle off returns the button to the local default without clearing what you typed, so you can flip
+					between a local game and a remote one without retyping it.
+				</p>
+
+				<div class="callout callout-note">
+					<strong>Note</strong>
+					<p>
+						Remote access needs the FiveM client started with the <code>-devcon</code> argument, and CL2
+						needs <code>-cl2</code>. Without <code>-devcon</code> the console only listens on loopback and a
+						remote IP will not connect.
+					</p>
+				</div>
+
+				<div class="callout callout-important">
+					<strong>Version</strong>
+					<p>
+						The IP and port overrides need <strong>v2.1.1</strong> or later. On earlier versions the
+						toggle is not present and every button uses <code>127.0.0.1:29200</code>.
 					</p>
 				</div>
 			</div>
@@ -176,6 +378,119 @@ const base = import.meta.env.BASE_URL;
 	.muted {
 		color: var(--text-muted);
 		font-size: 0.85rem;
+	}
+
+	.doc {
+		max-width: 760px;
+		margin: 0 auto;
+	}
+
+	.doc p {
+		color: var(--text-muted);
+		line-height: 1.65;
+		margin-bottom: 16px;
+	}
+
+	.doc h3 {
+		font-size: 1.05rem;
+		margin: 32px 0 12px;
+		color: var(--text);
+	}
+
+	/* Tables can outgrow a phone, so let them scroll rather than the page. */
+	.table-scroll {
+		overflow-x: auto;
+		margin: 0 0 20px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+	}
+
+	.doc-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.9rem;
+		min-width: 420px;
+	}
+
+	.doc-table th,
+	.doc-table td {
+		text-align: left;
+		padding: 10px 14px;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.doc-table thead th {
+		background: var(--bg-card);
+		color: var(--text);
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	.doc-table tbody td {
+		color: var(--text-muted);
+	}
+
+	.doc-table tbody tr:last-child td {
+		border-bottom: none;
+	}
+
+	.code-block {
+		background: #1a1a24;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		padding: 14px 16px;
+		margin: 0 0 20px;
+		overflow-x: auto;
+		font-size: 0.85rem;
+		line-height: 1.55;
+		color: var(--accent-light);
+		white-space: pre;
+		tab-size: 4;
+	}
+
+	.callout {
+		border-left: 3px solid var(--border);
+		border-radius: 0 var(--radius) var(--radius) 0;
+		background: var(--bg-card);
+		padding: 12px 16px;
+		margin: 0 0 20px;
+	}
+
+	.callout strong {
+		display: block;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		margin-bottom: 4px;
+	}
+
+	.callout p {
+		margin: 0;
+		font-size: 0.9rem;
+	}
+
+	.callout-note {
+		border-left-color: var(--accent);
+	}
+
+	.callout-note strong {
+		color: var(--accent-light);
+	}
+
+	.callout-important {
+		border-left-color: #d9a441;
+	}
+
+	.callout-important strong {
+		color: #e5bd74;
+	}
+
+	.callout-caution {
+		border-left-color: #d95f5f;
+	}
+
+	.callout-caution strong {
+		color: #e58a8a;
 	}
 
 	.guide-step {
