@@ -53,7 +53,7 @@ import Base from "../layouts/Base.astro";
 
 				<div class="info-card">
 					<h3>What does this do?</h3>
-					<p>If you're migrating from an older version of FXCommands (previously known as <code>com.egg-rp.fxcommands</code>), your exported profiles reference the old plugin UUID. This tool updates those references to <code>tf.josh.fxcommands</code> so your buttons work with the current version.</p>
+					<p>If your FXCommands buttons show as "action not found" after updating, your profile may reference an old plugin UUID. This tool fixes profiles from any previous version - including <code>com.egg-rp.fxcommands</code>, <code>tf.josh.fxcommands.action</code>, and other legacy variants - updating them to the current <code>tf.josh.fxcommands</code> UUID.</p>
 					<h3 style="margin-top: 16px">How to use</h3>
 					<ol>
 						<li>In the Stream Deck app, right-click your profile and choose <strong>Export</strong></li>
@@ -68,6 +68,8 @@ import Base from "../layouts/Base.astro";
 
 <script>
 	const OLD_UUIDS = [
+		"tf.josh.fxcommands.action",
+		"tf.josh.fxcommands.run-command",
 		"com.egg-rp.fxcommands",
 		"com.eggrp.fxcommands",
 		"com.egg-rp.fivem-commands"
@@ -90,7 +92,16 @@ import Base from "../layouts/Base.astro";
 	let updatedBlob: Blob | null = null;
 	let originalName = "updated.streamDeckProfile";
 
-	const JSZip = await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm").then(m => m.default);
+	let JSZip: any;
+	try {
+		JSZip = await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm").then(m => m.default);
+		console.log("[migrate] JSZip loaded:", typeof JSZip);
+	} catch (err) {
+		console.error("[migrate] Failed to load JSZip:", err);
+		status.style.display = "block";
+		status.textContent = "Failed to load JSZip library. Check your internet connection or ad blocker.";
+		status.className = "status status-error";
+	}
 
 	function formatSize(bytes: number): string {
 		if (bytes < 1024) return bytes + " B";
@@ -149,16 +160,24 @@ import Base from "../layouts/Base.astro";
 			let totalReplacements = 0;
 			const replacedIn: string[] = [];
 
+			console.log("[migrate] Zip loaded, files:", Object.keys(zip.files).length);
+
 			for (const [path, zipEntry] of Object.entries(zip.files)) {
-				if (path.endsWith("manifest.json")) {
+				const normalPath = path.replace(/\\/g, "/");
+				if (normalPath.endsWith("manifest.json")) {
 					let content = await (zipEntry as any).async("string");
 					let changed = false;
 
+					console.log("[migrate] Checking:", path, "length:", content.length);
+
+					// Process longest UUIDs first to avoid partial matches
 					for (const oldUuid of OLD_UUIDS) {
-						if (content.includes(oldUuid)) {
-							const count = (content.match(new RegExp(oldUuid.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) || []).length;
+						const escaped = oldUuid.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+						const matches = content.match(new RegExp(escaped, "g"));
+						if (matches && matches.length > 0) {
+							console.log("[migrate]   Found", matches.length, "x", oldUuid);
 							content = content.replaceAll(oldUuid, NEW_UUID);
-							totalReplacements += count;
+							totalReplacements += matches.length;
 							changed = true;
 						}
 					}
