@@ -269,3 +269,17 @@ section {
 		gap: 8px;
 	}
 }
+
+/* Available to assistive tech and search engines, but not shown. Used for the
+   homepage <h1>, where the product name is conveyed by the banner image. */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}

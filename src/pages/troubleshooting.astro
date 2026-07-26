@@ -63,6 +63,23 @@ import Base from "../layouts/Base.astro";
 				</details>
 
 				<details class="faq-item">
+					<summary>My dial does nothing, or rotation barely changes the value</summary>
+					<div class="faq-content"><div>
+						<p>Dial support needs <strong>v2.1.0</strong> or later on a Stream Deck+. Drop the action onto the dial row rather than a key, and fill in the <strong>Dial</strong> section — the key <strong>On Press</strong> field is only used when you push the dial in.</p>
+						<p>If <code>{'{rotationPercent}'}</code> moves very slowly, that is expected: it counts detents up to 255, so a full sweep takes several turns. Prefer <code>{'{ticks}'}</code> and let your server apply the change, since the plugin's counter is its own and will drift from the game's real value.</p>
+					</div></div>
+				</details>
+
+				<details class="faq-item">
+					<summary>No response text comes back onto the button</summary>
+					<div class="faq-content"><div>
+						<p>Command responses need <strong>v2.1.0</strong> or later, and they require a change on the server. When <strong>Show response</strong> is ticked the plugin appends a token like <code>@fxid:ab12cd34</code> to the command, then waits for a console line containing it.</p>
+						<p>Your command handler has to strip that token off the end of its arguments and print it back on the same line as the value. If nothing matches before the timeout — 1500ms by default, adjustable up to 5000ms in <strong>Advanced Settings</strong> — the button is left unchanged.</p>
+						<p>Only tick <strong>Show response</strong> for commands you have updated. Any other command receives <code>@fxid:...</code> as an unexpected extra argument.</p>
+					</div></div>
+				</details>
+
+				<details class="faq-item">
 					<summary>Can I use this with RedM?</summary>
 					<div class="faq-content"><div>
 						<p>Yes. FXCommands works with both FiveM and RedM. Both games use the same console protocol on <code>localhost:29200</code>.</p>

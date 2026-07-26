@@ -7,10 +7,14 @@ const base = import.meta.env.BASE_URL;
 <Base title="FXCommands - FiveM & RedM Stream Deck Plugin" description="Send commands to your FiveM or RedM client console directly from your Stream Deck.">
 	<section class="hero">
 		<div class="container">
-			<img src={`${base}banner.png`} alt="FXCommands" class="hero-banner" />
+			<h1 class="visually-hidden">FXCommands — FiveM &amp; RedM Stream Deck Plugin</h1>
+			<picture>
+				<source srcset={`${base}banner.webp`} type="image/webp" />
+				<img src={`${base}banner.png`} alt="" class="hero-banner" width="1898" height="1208" fetchpriority="high" decoding="async" />
+			</picture>
 			<p>Send commands to your FiveM or RedM client console directly from your Stream Deck.</p>
 			<div class="hero-buttons">
-				<a href="https://marketplace.elgato.com/product/fxcommands-3c018041-5776-412f-ad1b-1c0da734040b" target="_blank" rel="noopener" class="btn btn-primary">Get on Marketplace</a>
+				<a href="https://marketplace.elgato.com/product/fxcommands-3c018041-5776-412f-ad1b-1c0da734040b" target="_blank" rel="noopener" class="btn btn-primary">Add to Stream Deck</a>
 				<a href="https://github.com/josh-tf/fxcommands/releases/latest" target="_blank" rel="noopener" class="btn btn-secondary">Download from GitHub</a>
 			</div>
 		</div>
@@ -38,6 +42,16 @@ const base = import.meta.env.BASE_URL;
 					<h3>Delayed Commands</h3>
 					<p>Add timed delays between commands with <code>;;</code> for 500ms or <code>{'{NNNms}'}</code> for custom timing. Great for timed emote sequences.</p>
 					<p class="feature-example"><code>e think;{'{2000ms}'};e c</code></p>
+				</div>
+				<div class="feature-card">
+					<h3>Stream Deck+ Dials</h3>
+					<p>Drop the action on a dial and get separate commands for push, rotate left, rotate right and screen tap. Rotation can pass the movement through to your command.</p>
+					<p class="feature-example"><code>radio_volume_adjust {'{ticks}'}</code></p>
+				</div>
+				<div class="feature-card">
+					<h3>Command Responses</h3>
+					<p>Show a value your server sends back — volume, fuel, on-duty count — right on the button or dial. Opt in per command, and print the value from your resource.</p>
+					<p class="feature-example"><code>Radio Volume &rarr; 60%</code></p>
 				</div>
 				<div class="feature-card">
 					<h3>Connection Feedback</h3>

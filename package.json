@@ -6,9 +6,12 @@
 		"dev": "astro dev",
 		"build": "astro build",
 		"preview": "astro preview",
-		"deploy": "astro build && cp -r dist/ ../josh-tf/website/fxcommands/"
+		"deploy": "bash scripts/deploy.sh"
 	},
 	"dependencies": {
 		"astro": "^6.0.8"
+	},
+	"devDependencies": {
+		"sharp": "^0.35.3"
 	}
 }

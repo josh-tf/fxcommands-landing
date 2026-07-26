@@ -24,7 +24,10 @@ const base = import.meta.env.BASE_URL;
 					</div>
 				</div>
 				<div class="guide-step-img">
-					<img src={`${base}gh-releases.png`} alt="GitHub releases page" class="guide-img" />
+					<picture>
+						<source srcset={`${base}gh-releases.webp`} type="image/webp" />
+						<img src={`${base}gh-releases.png`} alt="GitHub releases page" class="guide-img" width="1481" height="1145" loading="lazy" decoding="async" />
+					</picture>
 				</div>
 			</div>
 			<div class="guide-step">
@@ -36,7 +39,10 @@ const base = import.meta.env.BASE_URL;
 					</div>
 				</div>
 				<div class="guide-step-img">
-					<img src={`${base}sd-install-prompt.png`} alt="Stream Deck install prompt" class="guide-img" />
+					<picture>
+						<source srcset={`${base}sd-install-prompt.webp`} type="image/webp" />
+						<img src={`${base}sd-install-prompt.png`} alt="Stream Deck install prompt" class="guide-img" width="502" height="157" loading="lazy" decoding="async" />
+					</picture>
 				</div>
 			</div>
 			<div class="guide-step">
@@ -48,7 +54,10 @@ const base = import.meta.env.BASE_URL;
 					</div>
 				</div>
 				<div class="guide-step-img">
-					<img src={`${base}sd-search.png`} alt="FXCommands in Stream Deck action list" class="guide-img" />
+					<picture>
+						<source srcset={`${base}sd-search.webp`} type="image/webp" />
+						<img src={`${base}sd-search.png`} alt="FXCommands in Stream Deck action list" class="guide-img" width="301" height="173" loading="lazy" decoding="async" />
+					</picture>
 				</div>
 			</div>
 		</div>
@@ -66,7 +75,10 @@ const base = import.meta.env.BASE_URL;
 					</div>
 				</div>
 				<div class="guide-step-img">
-					<img src={`${base}sd-drag-action.png`} alt="Dragging FXCommands action to Stream Deck" class="guide-img" />
+					<picture>
+						<source srcset={`${base}sd-drag-action.webp`} type="image/webp" />
+						<img src={`${base}sd-drag-action.png`} alt="Dragging FXCommands action to Stream Deck" class="guide-img" width="725" height="430" loading="lazy" decoding="async" />
+					</picture>
 				</div>
 			</div>
 			<div class="guide-step">
@@ -78,7 +90,10 @@ const base = import.meta.env.BASE_URL;
 					</div>
 				</div>
 				<div class="guide-step-img">
-					<img src={`${base}sd-property-inspector.png`} alt="FXCommands Property Inspector" class="guide-img" />
+					<picture>
+						<source srcset={`${base}sd-property-inspector.webp`} type="image/webp" />
+						<img src={`${base}sd-property-inspector.png`} alt="FXCommands Property Inspector" class="guide-img" width="543" height="244" loading="lazy" decoding="async" />
+					</picture>
 				</div>
 			</div>
 			<div class="guide-step">
@@ -90,7 +105,10 @@ const base = import.meta.env.BASE_URL;
 					</div>
 				</div>
 				<div class="guide-step-img">
-					<img src={`${base}fivem-sit.png`} alt="Command executing in FiveM" class="guide-img" />
+					<picture>
+						<source srcset={`${base}fivem-sit.webp`} type="image/webp" />
+						<img src={`${base}fivem-sit.png`} alt="Command executing in FiveM" class="guide-img" width="800" height="450" loading="lazy" decoding="async" />
+					</picture>
 				</div>
 			</div>
 		</div>
@@ -111,6 +129,22 @@ const base = import.meta.env.BASE_URL;
 					<p class="feature-example">
 						<code>Stage 0: e sit</code><br />
 						<code>Stage 1: e c</code>
+					</p>
+				</div>
+				<div class="feature-card">
+					<h3>Stream Deck+ Dials</h3>
+					<p>Drop the action onto the dial row and the panel gains a <strong>Dial</strong> section: separate commands for rotate left, rotate right and screen tap. Pushing the dial uses the same press/release fields as a key.</p>
+					<p class="feature-example">
+						<code>radio_volume_adjust {'{ticks}'}</code><br />
+						<span class="muted">{'{ticks}'} is how far it turned — negative left, positive right</span>
+					</p>
+				</div>
+				<div class="feature-card">
+					<h3>Command Responses</h3>
+					<p>Tick <strong>Show response</strong> and the plugin appends a short <code>@fxid:</code> token to the command, then shows whatever your resource prints back alongside it. Only enable it on commands whose handler strips that token.</p>
+					<p class="feature-example">
+						<code>print(("%s %s"):format(sdToken, volume))</code><br />
+						<span class="muted">On a dial, print a trailing % to draw a bar</span>
 					</p>
 				</div>
 				<div class="feature-card">
