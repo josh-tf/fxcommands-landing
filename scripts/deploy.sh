@@ -10,7 +10,8 @@
 set -euo pipefail
 
 WEBSITE_DIR="${WEBSITE_DIR:-$HOME/development/josh-tf/website}"
-SUBDIR="fxcommands"
+# The website serves static files from public/, so the bundle lives at public/fxcommands.
+SUBDIR="public/fxcommands"
 TARGET="${WEBSITE_DIR}/${SUBDIR}"
 
 if [ ! -d "${WEBSITE_DIR}/.git" ]; then
@@ -20,7 +21,7 @@ if [ ! -d "${WEBSITE_DIR}/.git" ]; then
 fi
 
 echo "==> Building"
-npm run build
+pnpm run build
 
 # Guard the rm -rf below: if the build produced nothing usable, keep the live copy.
 if [ ! -s "dist/index.html" ]; then
@@ -48,4 +49,4 @@ fi
 
 git commit -q -m "chore: rebuild fxcommands landing site" -- "${SUBDIR}"
 git push
-echo "==> Published — https://josh.tf/${SUBDIR}/"
+echo "==> Pushed to the website repo. Run \`pnpm run deploy\` there to put it live at https://josh.tf/fxcommands/"

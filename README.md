@@ -22,7 +22,7 @@ pnpm build     # static output in dist/
 
 ## Deploy
 
-`pnpm run deploy` runs `scripts/deploy.sh`, which builds the site, replaces the `fxcommands` directory in a local checkout of the website repo with `dist/`, commits that directory only, and pushes. The checkout defaults to `~/development/josh-tf/website`; set `WEBSITE_DIR` to override it. The website repo then needs its own deploy to go live. No secrets are needed beyond push access to the website repo.
+`pnpm run deploy` runs `scripts/deploy.sh`, which builds the site, replaces `public/fxcommands/` in a local checkout of the website repo with `dist/`, commits that directory only, and pushes. The checkout defaults to `~/development/josh-tf/website`; set `WEBSITE_DIR` to override it. The website repo then needs its own deploy to go live. No secrets are needed beyond push access to the website repo.
 
 ## License
 
